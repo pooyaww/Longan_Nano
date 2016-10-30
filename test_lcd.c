@@ -5,11 +5,11 @@
 #define F_CPU 16000000UL
 #include <util/delay.h>
 
-#define CS  PB0 // Chip select
-#define RST PB1 // Reset
-#define DC  PB2 // Data/Command
-#define SCL PB3 // Clock line
-#define SDA PB4 // Data line
+#define CS  PB3 // Chip select
+#define RST PB5 // Reset
+#define DC  PB4 // Data/Command
+#define SCL PB2 // Clock line
+#define SDA PB0 // Data line
 
 inline void send_byte(uint8_t byte) {
     PORTB |= 1 << SCL;
@@ -20,10 +20,10 @@ inline void send_byte(uint8_t byte) {
             PORTB |=  (1 << SDA);
         else
             PORTB &= ~(1 << SDA);
-        _delay_us(1);
+        _delay_us(5);
         PORTB |= 1 << SCL;
         byte <<= 1;
-        _delay_us(1);
+        _delay_us(5);
     }
 }
 
@@ -79,34 +79,34 @@ void init() {
     _delay_ms(500);
 
     send_command(0xAF); // Display OFF
-	send_command(0xA0); // Set remap
-	send_command(0x72); // RGB
-	send_command(0xA1); // Start line
-	send_command(0x00);
-	send_command(0xA2); // Display offset
-	send_command(0x00);
+    send_command(0xA0); // Set remap
+    send_command(0x72); // RGB
+    send_command(0xA1); // Start line
+    send_command(0x00);
+    send_command(0xA2); // Display offset
+    send_command(0x00);
 
-	send_command(0xA4); // Normal display
-	send_command(0xA8); // Set multiplex
-	send_command(0x3F); // 1/64 duty
-	send_command(0xAD); // Set master
-	send_command(0x8E); 
-	send_command(0xB0); // Power mode
-	send_command(0x0B);
-	send_command(0xB1); // Precharge
-	send_command(0x31);
+    send_command(0xA4); // Normal display
+    send_command(0xA8); // Set multiplex
+    send_command(0x3F); // 1/64 duty
+    send_command(0xAD); // Set master
+    send_command(0x8E); 
+    send_command(0xB0); // Power mode
+    send_command(0x0B);
+    send_command(0xB1); // Precharge
+    send_command(0x31);
 
-	send_command(0xB3); // Clock div
-	send_command(0xF0); // 7:4 -> freq., 3:0 -> div ratio
+    send_command(0xB3); // Clock div
+    send_command(0xF0); // 7:4 -> freq., 3:0 -> div ratio
 
-	send_command(0x8A); // Precharge A
-	send_command(0x64);
-	send_command(0x8B); // Precharge B
-	send_command(0x78);
-	send_command(0x8C); // Precharge C
-	send_command(0x64);
+    send_command(0x8A); // Precharge A
+    send_command(0x64);
+    send_command(0x8B); // Precharge B
+    send_command(0x78);
+    send_command(0x8C); // Precharge C
+    send_command(0x64);
     send_command(0xBB); // Precharge level
-	send_command(0x3A);
+    send_command(0x3A);
 
     send_command(0xBE); // V_COMH
     send_command(0x3E);
@@ -120,7 +120,7 @@ void init() {
     send_command(0x83); // Contrast C
     send_command(0x7D);
 
-	send_command(0xAF); // Display ON
+    send_command(0xAF); // Display ON
 }
 
 int main(void) {
@@ -134,11 +134,7 @@ int main(void) {
     cursor(0, 0);
 
     while (1) {
-        PORTB |=  (1 << DC);
-        PORTB &= ~(1 << CS);
-        send_byte(0xFF);
-        send_byte(0xFF);
-        PORTB |=  (1 << CS);
-        _delay_ms(1);
+        send_data(0xFF);
+        send_data(0xFF);
     }
 }
