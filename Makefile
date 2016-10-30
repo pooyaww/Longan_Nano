@@ -1,10 +1,10 @@
 all: program
 
 %.o: %.c
-	avr-gcc -std=gnu99 -Os -mmcu=$(MCU) $^ -c -o $@
+	avr-gcc -lm -std=gnu99 -Os -mmcu=$(MCU) $^ -c -o $@
 
 %.elf: %.o
-	avr-gcc -O3 -mmcu=$(MCU) $^ -o $@
+	avr-gcc -O3 -lm -mmcu=$(MCU) $^ -o $@
 
 %.hex: %.elf
 	avr-objcopy -j .text -j .data -O ihex $^ $@
