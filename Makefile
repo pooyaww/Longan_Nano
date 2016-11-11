@@ -13,7 +13,7 @@ clean:
 	$(RM) *.o *.hex *.elf
 
 fuse:
-	avrdude -c usbasp-clone -P USB -U lfuse:w:0xf1:m -p $(DEV)
+	sudo avrdude -c usbasp-clone -P USB -U lfuse:w:0xf1:m -p $(DEV)
 
 program: $(TARGET).hex $(TARGET).elf
-	avrdude -c usbasp-clone -P USB -U flash:w:$(TARGET).hex -p $(DEV)
+	sudo avrdude -c usbasp-clone -P USB -U flash:w:$(TARGET).hex -p $(DEV)
