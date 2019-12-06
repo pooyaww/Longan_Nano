@@ -1,128 +1,9 @@
-#include <avr/io.h>
-#include <avr/cpufunc.h>
+#include <math.h>
 #include <stdint.h>
 #include <float.h>
-
-#define F_CPU 16000000UL
-#include <util/delay.h>
-
-#define CS  PB3 // Chip select
-#define RST PB5 // Reset
-#define DC  PB4 // Data/Command
-#define SCL PB2 // Clock line
-#define SDA PB0 // Data line
-
-static void send_byte(uint8_t byte) {
-    PORTB |= 1 << SCL;
-    #pragma unroll
-    for (int8_t i = 7; i >= 0; i--) {
-        PORTB &= ~(1 << SCL);
-        if (byte & 0x80)
-            PORTB |=  (1 << SDA);
-        else
-            PORTB &= ~(1 << SDA);
-        _delay_us(5);
-        PORTB |= 1 << SCL;
-        byte <<= 1;
-        _delay_us(5);
-    }
-}
-
-static void send_command(uint8_t cmd) {
-    PORTB &= ~(1 << DC);
-    PORTB &= ~(1 << CS);
-    send_byte(cmd);
-    PORTB |=  (1 << CS);
-}
-
-static void send_data(uint8_t cmd) {
-    PORTB |=  (1 << DC);
-    PORTB &= ~(1 << CS);
-    send_byte(cmd);
-    PORTB |=  (1 << CS);
-}
-
-static void fill(uint16_t col) {
-    send_command(0x26); // Enable fill
-    send_command(0x01);
-
-    send_command(0x22); // Draw rectangle
-    send_command(0x00);
-    send_command(0x00);
-    send_command(0x5F);
-    send_command(0x3F);
-    send_command((col & 0x3F) << 1);
-    send_command((col >> 5) & 0x1F);
-    send_command((col >> 10) & 0x3F);
-    send_command((col & 0x3F) << 1);
-    send_command((col >> 5) & 0x1F);
-    send_command((col >> 10) & 0x3F);
-}
-
-static void cursor(uint8_t x, uint8_t y) {
-    send_command(0x15);
-    send_command(x);
-    send_command(0x5F);
-
-    send_command(0x75);
-    send_command(y);
-    send_command(0x3F);
-}
-
-static void init() {
-    PORTB &= ~(1 << CS);
-
-    PORTB |=  (1 << RST);
-    _delay_ms(500);
-    PORTB &= ~(1 << RST);
-    _delay_ms(500);
-    PORTB |=  (1 << RST);
-    _delay_ms(500);
-
-    send_command(0xAF); // Display OFF
-    send_command(0xA0); // Set remap
-    send_command(0x72); // RGB
-    send_command(0xA1); // Start line
-    send_command(0x00);
-    send_command(0xA2); // Display offset
-    send_command(0x00);
-
-    send_command(0xA4); // Normal display
-    send_command(0xA8); // Set multiplex
-    send_command(0x3F); // 1/64 duty
-    send_command(0xAD); // Set master
-    send_command(0x8E); 
-    send_command(0xB0); // Power mode
-    send_command(0x0B);
-    send_command(0xB1); // Precharge
-    send_command(0x31);
-
-    send_command(0xB3); // Clock div
-    send_command(0xF0); // 7:4 -> freq., 3:0 -> div ratio
-
-    send_command(0x8A); // Precharge A
-    send_command(0x64);
-    send_command(0x8B); // Precharge B
-    send_command(0x78);
-    send_command(0x8C); // Precharge C
-    send_command(0x64);
-    send_command(0xBB); // Precharge level
-    send_command(0x3A);
-
-    send_command(0xBE); // V_COMH
-    send_command(0x3E);
-
-    send_command(0x87); // Master current
-    send_command(0x06);
-    send_command(0x81); // Contrast A
-    send_command(0x91);
-    send_command(0x82); // Contrast B
-    send_command(0x50);
-    send_command(0x83); // Contrast C
-    send_command(0x7D);
-
-    send_command(0xAF); // Display ON
-}
+#include "lcd/lcd.h"
+#include "fatfs/tf_card.h"
+#include <string.h>
 
 static inline float sq(float t)    { return t * t; }
 
@@ -351,24 +232,26 @@ static inline ray_t gen_ray(cam_t cam, float x, float y) {
 }
 
 int main(void) {
-    DDRB = 0xFF;
 
-    _delay_ms(10);
-    init();
+    Lcd_Init();
+    LCD_Clear(WHITE);
+    BACK_COLOR = WHITE;
 
-    fill(0xFFFF);
+    LEDR(1);
+    LEDG(1);
+    LEDB(1);
 
-    const uint8_t w = 96, h = 64;
+    const uint8_t w = 160, h = 80;
     float t = 0;
     while (1) {
         cam_t cam = gen_cam(t);
-        cursor(0, 0);
+        LCD_Address_Set(0, 0, w - 1, h - 1);
         for (uint8_t y = 0; y < h; y++) {
             for (uint8_t x = 0; x < w; x++) {
                 ray_t ray = gen_ray(cam, (float)x / (float)w, (float)y / (float)h);
                 rgb_t color = trace(t, &ray);
-                send_data((color.r << 3)   | (color.g >> 3));
-                send_data(((color.g & 0x07) << 5) | color.b);
+                u16 data = color.b | (color.g << 5) | (color.r << 11);
+                LCD_WR_DATA(data);
             }
         }
         t += (float)0.1;

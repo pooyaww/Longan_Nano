@@ -1,0 +1,24 @@
+clang
+
+%c -std=c11
+%cpp -std=c++17
+
+-I/home/puya/Projects/RISC-V/sipeed/platform-gd32v/examples/Longan_GD32VF_examples/Render/include
+-I/home/puya/Projects/RISC-V/sipeed/platform-gd32v/examples/Longan_GD32VF_examples/Render/src
+-I/home/puya/.platformio/packages/framework-gd32vf103-sdk/GD32VF103_standard_peripheral
+-I/home/puya/.platformio/packages/framework-gd32vf103-sdk/GD32VF103_standard_peripheral/Include
+-I/home/puya/.platformio/packages/framework-gd32vf103-sdk/GD32VF103_usbfs_driver
+-I/home/puya/.platformio/packages/framework-gd32vf103-sdk/GD32VF103_usbfs_driver/Include
+-I/home/puya/.platformio/packages/framework-gd32vf103-sdk/RISCV/drivers
+-I/home/puya/.platformio/packages/framework-gd32vf103-sdk/RISCV/env_Eclipse
+-I/home/puya/.platformio/packages/framework-gd32vf103-sdk/RISCV/stubs
+-I/home/puya/.platformio/packages/toolchain-gd32v/riscv-nuclei-elf/include
+-I/home/puya/.platformio/packages/toolchain-gd32v/riscv-nuclei-elf/include/c++/9.2.0
+-I/home/puya/.platformio/packages/toolchain-gd32v/riscv-nuclei-elf/include/c++/9.2.0/riscv-nuclei-elf
+-I/home/puya/.platformio/packages/toolchain-gd32v/lib/gcc/riscv-nuclei-elf/9.2.0/include-fixed
+-I/home/puya/.platformio/packages/toolchain-gd32v/lib/gcc/riscv-nuclei-elf/9.2.0/include
+-I/home/puya/.platformio/packages/tool-unity
+
+-DPLATFORMIO=40100
+-DUSE_STDPERIPH_DRIVER
+-DHXTAL_VALUE=8000000U
