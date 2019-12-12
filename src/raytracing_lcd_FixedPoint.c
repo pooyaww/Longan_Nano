@@ -317,9 +317,9 @@ int main(void) {
     LCD_Clear(WHITE);
     BACK_COLOR = WHITE;
 
-    LEDR(1);
-    LEDG(1);
-    LEDB(1);
+    //LEDR(1);
+    //LEDG(1);
+    //LEDB(1);
 
     const uint8_t w = 160, h = 80;
     float t = 0;
