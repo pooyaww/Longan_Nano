@@ -266,7 +266,7 @@ static rgb_t trace(fixed t, const ray_t* ray) {
         fixed k1 = fpabs(fpmul(FP_ONE   - t, FP_ONE/2 - t));
         fixed k2 = fpabs(fpmul(0        - t, FP_ONE   - t));
         fixed k3 = fpabs(fpmul(FP_ONE/2 - t, 0        - t));
-        fixed inv = fpdiv(FP_ONE, k1 + k2 + k3);
+        fixed inv = fpdiv(FP_ONE*3, k1 + k2 + k3);
 
         fixed r = fpmul(inv, (k1 + k3) / 10 * 9 + k2 / 10 * 5);
         fixed g = fpmul(inv, (k1 + k3) / 10 * 1 + k2 / 10 * 8);
