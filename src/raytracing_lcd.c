@@ -192,7 +192,7 @@ static rgb_t trace(float t, const ray_t* ray) {
         float k1 = fabsf((1   - t) * (0.5 - t));
         float k2 = fabsf((0   - t) * (1   - t));
         float k3 = fabsf((0.5 - t) * (0   - t));
-        float inv = (float)1.0 / (k1 + k2 + k3);
+        float inv = (float)3.0 / (k1 + k2 + k3);
 
         float r = inv * ((k1 + k3) * 0.9 + k2 * 0.5);
         float g = inv * ((k1 + k3) * 0.1 + k2 * 0.8);
